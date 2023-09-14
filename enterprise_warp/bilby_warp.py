@@ -40,17 +40,17 @@ class PTABilbyLikelihood(bilby.Likelihood):
             else:
                 curparameters[param] = self.parameters[param]
         if tmparamname is not None:
-            if n is not None and len(tmparams) == 2:
+            if n is not None and len(tmparams) == 3:
                 # convert braking index to f2psr.t2pulsar[p].val + psr.t2pulsar[p].err
                 f0 = self.psr.t2pulsar["F0"].val + tmparams[0] * self.psr.t2pulsar["F0"].err
                 f1 = self.psr.t2pulsar["F1"].val + tmparams[1] * self.psr.t2pulsar["F1"].err
 
-                print(f0, f1, n)
+                #print(f0, f1, n)
 
                 f2 = n * f1**2 / f0
 
-                print(f2)
-                tmparams.append(f2)
+                #print(f2)
+                tmparams[2] = f2
             
             curparameters[tmparamname] = tmparams
 
@@ -121,10 +121,6 @@ def get_bilby_prior_dict(pta, braking_index=None):
                     )
             elif param.type == "uniform":
                 for ii in range(param.size):
-                    if braking_index is not None and ii == 2:
-                        # do not add f2 to prior if using braking index
-                        continue
-
                     priors[param.name + "_" + str(ii)] = bilby.core.prior.Uniform(
                         param.prior._defaults['pmin'],
                         param.prior._defaults['pmax'],
