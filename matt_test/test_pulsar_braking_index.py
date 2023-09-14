@@ -45,7 +45,7 @@ timfile = "J0030+0451.tim"
 
 psr = Pulsar(parfile, timfile, drop_t2pulsar=False)
 
-plist = ["F0", "F1"]  # vary F0 and F1
+plist = ["F0", "F1", "F2"]  # vary F0 and F1 (and F2 via braking index)
 
 pta = model_singlepsr_noise(
     psr,
@@ -59,12 +59,12 @@ pta = model_singlepsr_noise(
 )
 
 
-outdir = "test/"
+outdir = "test_braking_indices/"
 
 # run using enterprise_warp to access bilby_mcmc
-priors = bilby_warp.get_bilby_prior_dict(pta)
+priors = bilby_warp.get_bilby_prior_dict(pta, braking_index=[0, 10])
 parameters = dict.fromkeys(priors.keys())
-likelihood = bilby_warp.PTABilbyLikelihood(pta, parameters)
+likelihood = bilby_warp.PTABilbyLikelihood(pta, psr, parameters)
 
 label = "test_bilby"
 bilby.run_sampler(likelihood=likelihood, priors=priors, outdir=outdir, label=label, sampler="bilby_mcmc", nsamples=1000)
