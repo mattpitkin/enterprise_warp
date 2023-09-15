@@ -61,9 +61,6 @@ class PTABilbyLikelihood(bilby.Likelihood):
 
                 tmparams[2] = f2
 
-                # stick derived f2 into returned parameters
-                self.parameters[f2param] = f2
-
             curparameters[tmparamname] = tmparams
 
         return self.pta.get_lnlikelihood(curparameters)

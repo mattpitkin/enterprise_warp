@@ -85,6 +85,14 @@ for i, p in enumerate(["F0", "F1"]):
         + psr.t2pulsar[p].err * res.posterior[f"J0030+0451_timing model_tmparams_{i}"]
     )
 
+
+# convert braking index, f0 and f1 to f2
+n = res.posterior["braking_index"]
+f0 = res.posterior[f"J0030+0451_timing model_tmparams_0"]
+f1 = res.posterior[f"J0030+0451_timing model_tmparams_1"]
+
+res.posterior[f"J0030+0451_timing model_tmparams_2"] = n * f1**2 / f0
+
 fig = res.plot_corner(
     filename="test_bilby.png",
     labels=[
