@@ -67,12 +67,26 @@ parameters = dict.fromkeys(priors.keys())
 likelihood = bilby_warp.PTABilbyLikelihood(pta, psr, parameters)
 
 label = "test_bilby"
-#bilby.run_sampler(likelihood=likelihood, priors=priors, outdir=outdir, label=label, sampler="dynesty")  # sampler="bilby_mcmc", nsamples=1000)
+# bilby.run_sampler(likelihood=likelihood, priors=priors, outdir=outdir, label=label, sampler="dynesty")  # sampler="bilby_mcmc", nsamples=1000)
 
 res = read_in_result(os.path.join(outdir, f"{label}_result.json"))
 
 # convert F0 and F1 into true ranges
 for i, p in enumerate(["F0", "F1"]):
-    res.posterior[f"J0030+0451_timing model_tmparams_{i}"] = psr.t2pulsar[p].val + psr.t2pulsar[p].err * res.posterior[f"J0030+0451_timing model_tmparams_{i}"]
+    res.posterior[f"J0030+0451_timing model_tmparams_{i}"] = (
+        psr.t2pulsar[p].val
+        + psr.t2pulsar[p].err * res.posterior[f"J0030+0451_timing model_tmparams_{i}"]
+    )
 
-fig = res.plot_corner(filename="test_bilby.png", labels=["$n$", "EFAC", "ECORR", "EQUAD", "$f_0$ (Hz)", "$\dot{f}$ (Hz/s)", "$\ddot{f}$ (Hz/s$^2$)"])
+fig = res.plot_corner(
+    filename="test_bilby.png",
+    labels=[
+        "$n$",
+        "EFAC",
+        "ECORR",
+        "EQUAD",
+        "$f_0$ (Hz)",
+        "$\dot{f}$ (Hz/s)",
+        "$\ddot{f}$ (Hz/s$^2$)",
+    ],
+)

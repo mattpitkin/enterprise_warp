@@ -1,5 +1,6 @@
 import bilby
 
+
 class PTABilbyLikelihood(bilby.Likelihood):
     """
     The class that wraps Enterprise likelihood in Bilby likelihood.
@@ -11,6 +12,7 @@ class PTABilbyLikelihood(bilby.Likelihood):
     parameters: list
       A list of signal parameter names
     """
+
     def __init__(self, pta, psr, parameters):
         self.pta = pta
         self.psr = psr
@@ -46,8 +48,14 @@ class PTABilbyLikelihood(bilby.Likelihood):
         if tmparamname is not None:
             if n is not None and len(tmparams) == 3:
                 # convert braking index to f2
-                f0 = self.psr.t2pulsar["F0"].val + tmparams[0] * self.psr.t2pulsar["F0"].err
-                f1 = self.psr.t2pulsar["F1"].val + tmparams[1] * self.psr.t2pulsar["F1"].err
+                f0 = (
+                    self.psr.t2pulsar["F0"].val
+                    + tmparams[0] * self.psr.t2pulsar["F0"].err
+                )
+                f1 = (
+                    self.psr.t2pulsar["F1"].val
+                    + tmparams[1] * self.psr.t2pulsar["F1"].err
+                )
 
                 f2 = n * f1**2 / f0
 
@@ -55,13 +63,14 @@ class PTABilbyLikelihood(bilby.Likelihood):
 
                 # stick derived f2 into returned parameters
                 self.parameters[f2param] = f2
-            
+
             curparameters[tmparamname] = tmparams
 
         return self.pta.get_lnlikelihood(curparameters)
 
     def get_one_sample(self):
         return {par.name: par.sample() for par in self.pta.params}
+
 
 def get_bilby_prior_dict(pta, braking_index=None):
     """
@@ -73,7 +82,7 @@ def get_bilby_prior_dict(pta, braking_index=None):
     pta: enterprise.signals.signal_base.PTA
         Enterprise PTA object that contains pulsar data and noise models
     braking_index: list
-        A range of braking indices to use as a prior. 
+        A range of braking indices to use as a prior.
     """
     priors = dict()
 
@@ -87,28 +96,31 @@ def get_bilby_prior_dict(pta, braking_index=None):
         )
 
     for param in pta.params:
-        if param.size==None:
-            if param.type=='uniform':
-                #priors[param.name] = bilby.core.prior.Uniform( \
+        if param.size == None:
+            if param.type == "uniform":
+                # priors[param.name] = bilby.core.prior.Uniform( \
                 #    param._pmin, param._pmax, param.name)
                 priors[param.name] = bilby.core.prior.Uniform(
                     # param._pmin
-                    param.prior._defaults['pmin'],
-                    param.prior._defaults['pmax'],
-                    param.name
+                    param.prior._defaults["pmin"],
+                    param.prior._defaults["pmax"],
+                    param.name,
                 )
-            elif param.type=='normal':
-                #priors[param.name] = bilby.core.prior.Normal( \
+            elif param.type == "normal":
+                # priors[param.name] = bilby.core.prior.Normal( \
                 #    param._mu, param._sigma, param.name)
                 priors[param.name] = bilby.core.prior.Normal(
-                    param.prior._defaults['mu'], param.prior._defaults['sigma'],
-                    param.name
+                    param.prior._defaults["mu"],
+                    param.prior._defaults["sigma"],
+                    param.name,
                 )
-            elif param.type=='truncatednormal':
+            elif param.type == "truncatednormal":
                 priors[param.name] = bilby.core.prior.TruncatedGaussian(
-                    param.prior._defaults['mu'], param.prior._defaults['sigma'],
-                    param.prior._defaults['minv'], param.prior._defaults['maxv'],
-                    param.name
+                    param.prior._defaults["mu"],
+                    param.prior._defaults["sigma"],
+                    param.prior._defaults["minv"],
+                    param.prior._defaults["maxv"],
+                    param.name,
                 )
             else:
                 raise ValueError(
@@ -118,17 +130,17 @@ def get_bilby_prior_dict(pta, braking_index=None):
 
         else:
             print(param.name, param.type)
-            if param.name=='jup_orb_elements' and param.type=='uniform':
+            if param.name == "jup_orb_elements" and param.type == "uniform":
                 for ii in range(param.size):
-                    priors[param.name+'_'+str(ii)] = bilby.core.prior.Uniform(
-                        -0.05, 0.05, param.name+'_'+str(ii)
+                    priors[param.name + "_" + str(ii)] = bilby.core.prior.Uniform(
+                        -0.05, 0.05, param.name + "_" + str(ii)
                     )
             elif param.type == "uniform":
                 for ii in range(param.size):
                     priors[param.name + "_" + str(ii)] = bilby.core.prior.Uniform(
-                        param.prior._defaults['pmin'],
-                        param.prior._defaults['pmax'],
-                        param.name + "_" + str(ii)
+                        param.prior._defaults["pmin"],
+                        param.prior._defaults["pmax"],
+                        param.name + "_" + str(ii),
                     )
             else:
                 raise ValueError(
@@ -141,7 +153,8 @@ def get_bilby_prior_dict(pta, braking_index=None):
     # Consistency check
     for key, _ in priors.items():
         if key not in pta.param_names and key != "braking_index":
-            print('[!] Warning: Bilby\'s ',key,' is not in PTA params:',\
-                  pta.param_names)
+            print(
+                "[!] Warning: Bilby's ", key, " is not in PTA params:", pta.param_names
+            )
 
     return priors
