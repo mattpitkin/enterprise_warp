@@ -24,6 +24,7 @@ class PTABilbyLikelihood(bilby.Likelihood):
 
         # braking index
         n = None
+        f2param = None
 
         # add timing parameters into a list
         for param in self.parameters:
@@ -35,22 +36,25 @@ class PTABilbyLikelihood(bilby.Likelihood):
             if "timing model_tmparams" in param:
                 tmparams.append(self.parameters[param])
 
+                if "timing model_tmparams_2" in param:
+                    f2param = param
+
                 if tmparamname is None:
                     tmparamname = "_".join(param.split("_")[:-1])
             else:
                 curparameters[param] = self.parameters[param]
         if tmparamname is not None:
             if n is not None and len(tmparams) == 3:
-                # convert braking index to f2psr.t2pulsar[p].val + psr.t2pulsar[p].err
+                # convert braking index to f2
                 f0 = self.psr.t2pulsar["F0"].val + tmparams[0] * self.psr.t2pulsar["F0"].err
                 f1 = self.psr.t2pulsar["F1"].val + tmparams[1] * self.psr.t2pulsar["F1"].err
 
-                #print(f0, f1, n)
-
                 f2 = n * f1**2 / f0
 
-                #print(f2)
                 tmparams[2] = f2
+
+                # stick derived f2 into returned parameters
+                self.parameters[f2param] = f2
             
             curparameters[tmparamname] = tmparams
 
