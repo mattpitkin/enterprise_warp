@@ -1,6 +1,6 @@
 """
-An attempt to use Enterprise and enterprise_extensions to fit the frequency and
-frequency derivative parameters of a pulsar.
+An attempt to use Enterprise and enterprise_extensions to fit the frequency,
+frequency derivative and braking index parameters of a pulsar.
 
 This is based on the example given in the Google Colab notebook here https://colab.research.google.com/drive/11aRVepxn_whRm_JWCbgL_sVqn1hjo9Ik#scrollTo=YG3yG0qY8cor (see the "Now, the easy way to do all of this") and using
 the data from https://github.com/AaronDJohnson/wn_sp_tutorial.git (which also contains the above notebook).
